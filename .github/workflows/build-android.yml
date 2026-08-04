@@ -1,31 +1,40 @@
-steps:
-  - name: Descargar el código
-    uses: actions/checkout@v4
+name: Compilar Stratofier APK
 
-  - name: Instalar Java (JDK 11)
-    uses: actions/setup-java@v4
-    with:
-      java-version: '11'
-      distribution: 'temurin'
+on:
+  workflow_dispatch:
 
-  - name: Instalar entorno gráfico Qt 5.15
-    uses: jurplel/install-qt-action@v4
-    with:
-      version: '5.15.2'
-      host: 'linux'
-      target: 'android'
-      arch: 'android_armv7'
+jobs:
+  build:
+    runs-on: ubuntu-22.04
 
-  - name: Compilar el código fuente a APK
-    run: |
-      mkdir build && cd build
-      qmake ../Stratofier.pro -spec android-clang "CONFIG+=release"
-      make -j$(nproc)
-      make install INSTALL_ROOT=android-build
-      androiddeployqt --input android-libStratofier.so-deployment-settings.json --output android-build --gradle --release
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Java (JDK 11)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Instalar entorno gráfico Qt 5.15
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '5.15.2'
+          host: 'linux'
+          target: 'android'
+          arch: 'android_armv7'
+
+      - name: Compilar el código fuente a APK
+        run: |
+          mkdir build && cd build
+          qmake ../Stratofier.pro -spec android-clang "CONFIG+=release"
+          make -j$(nproc)
+          make install INSTALL_ROOT=android-build
+          androiddeployqt --input android-libStratofier.so-deployment-settings.json --output android-build --gradle --release
       
-  - name: Guardar el APK generado
-    uses: actions/upload-artifact@v4
-    with:
-      name: Stratofier-APK
-      path: build/android-build/build/outputs/apk/release/*.apk
+      - name: Guardar el APK generado
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stratofier-APK
+          path: build/android-build/build/outputs/apk/release/*.apk
