@@ -34,13 +34,13 @@ jobs:
           arch: 'gcc_64'
           dir: '${{ github.workspace }}/qt'
 
-      - name: Install Qt for Android (armv7)
+      - name: Install Qt for Android
         uses: jurplel/install-qt-action@v3
         with:
           version: '5.15.2'
           host: 'linux'
           target: 'android'
-          arch: 'android_armv7'
+          arch: 'android'
           dir: '${{ github.workspace }}/qt'
 
       - name: Build APK
@@ -48,9 +48,7 @@ jobs:
           ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/21.4.7075529
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: |
-          qmake Stratofier.pro \
-            -spec android-clang \
-            ANDROID_ABIS="armeabi-v7a"
+          qmake Stratofier.pro -spec android-clang
           make -j$(nproc)
           make INSTALL_ROOT="$(pwd)/android-build" install
           androiddeployqt \
