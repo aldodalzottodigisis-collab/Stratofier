@@ -17,24 +17,26 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Instalar entorno gráfico Qt 5.15
+      - name: Instalar Qt 5.15
         uses: jurplel/install-qt-action@v4
         with:
           version: '5.15.2'
           host: 'linux'
           target: 'android'
           arch: 'android_armv7'
-          extra: '--no-updates'
+          # Esto evita que la acción intente usar el sistema de paquetes que está fallando
+          setup-python: 'false'
 
-      - name: Compilar el código fuente a APK
+      - name: Compilar el código fuente
         run: |
           mkdir build && cd build
           qmake ../Stratofier.pro -spec android-clang "CONFIG+=release"
           make -j$(nproc)
-          make install INSTALL_ROOT=android-build
+          # Esto genera los archivos de despliegue de Android
+          make INSTALL_ROOT=android-build install
           androiddeployqt --input android-libStratofier.so-deployment-settings.json --output android-build --gradle --release
       
-      - name: Guardar el APK generado
+      - name: Guardar el APK
         uses: actions/upload-artifact@v4
         with:
           name: Stratofier-APK
