@@ -52,14 +52,19 @@ jobs:
           sdkmanager "platforms;android-${ANDROID_API_LEVEL}"
           sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
           sdkmanager "ndk;${ANDROID_NDK_VERSION}"
+          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Show qmake being used (sanity check)
+        run: |
+          which qmake
+          qmake -v
 
       - name: Configure with qmake
         run: |
           mkdir -p build-android
           cd build-android
-          ${{ steps.qt-android.outputs.qtToolsDir || steps.qt-android.outputs.qtInstallDir }}/bin/qmake \
-            ../Stratofier.pro \
-            ANDROID_ABIS="arm64-v8a"
+          qmake ../Stratofier.pro ANDROID_ABIS="arm64-v8a"
 
       - name: Build (make)
         run: |
@@ -69,7 +74,7 @@ jobs:
       - name: Package APK with androiddeployqt
         run: |
           cd build-android
-          ${{ steps.qt-android.outputs.qtInstallDir }}/bin/androiddeployqt \
+          androiddeployqt \
             --input android-Stratofier-deployment-settings.json \
             --output android-build \
             --android-platform "android-${ANDROID_API_LEVEL}" \
