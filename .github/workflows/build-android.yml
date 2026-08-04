@@ -23,4 +23,4 @@ jobs:
           make -j$(nproc)
 
       - name: Aviso de éxito
-        run: echo "Compilación terminada. Nota: Como el entorno de Qt moderno es complejo, si esto compila, el siguiente paso es empaquetar el APK."
+        run: echo "Compilación terminada."
