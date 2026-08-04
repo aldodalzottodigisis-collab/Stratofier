@@ -11,16 +11,18 @@ jobs:
       - name: Descargar el código
         uses: actions/checkout@v4
 
-      - name: Instalar dependencias del sistema
+      - name: Instalar dependencias para Qt5
         run: |
           sudo apt-get update
-          sudo apt-get install -y qt5-default qt5-qmake qtbase5-dev-tools qt5-qmake-bin qtbase5-dev build-essential
+          # qt5-default no existe en Ubuntu 22.04, usamos los paquetes base:
+          sudo apt-get install -y qtbase5-dev qtbase5-dev-tools qt5-qmake build-essential
 
       - name: Compilar
         run: |
           mkdir build && cd build
-          qmake ../Stratofier.pro -spec linux-g++ "CONFIG+=release"
+          # Usamos qmake para generar el Makefile
+          qmake ../Stratofier.pro CONFIG+=release
           make -j$(nproc)
 
-      - name: Aviso de éxito
-        run: echo "Compilación terminada."
+      - name: Éxito
+        run: echo "Compilación terminada con éxito."
