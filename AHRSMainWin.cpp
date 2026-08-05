@@ -42,13 +42,13 @@ Stratofier Stratux AHRS Display
 extern QSettings *g_pSet;
 
 
-// Standard fonts used throughout the app
-QFont itsy(  "Droid Sans", 8,  QFont::Normal );
-QFont wee(   "Droid Sans", 10, QFont::Normal );
-QFont tiny(  "Droid Sans", 14, QFont::Normal );
-QFont small( "Droid Sans", 16, QFont::Normal );
-QFont med(   "Droid Sans", 18, QFont::Bold   );
-QFont large( "Droid Sans", 24, QFont::Bold   );
+// Fuentes del sistema (existen en Android 16; Droid Sans ya no)
+QFont itsy(  "sans-serif", 8,  QFont::Normal );
+QFont wee(   "sans-serif", 10, QFont::Normal );
+QFont tiny(  "sans-serif", 14, QFont::Normal );
+QFont small( "sans-serif", 16, QFont::Normal );
+QFont med(   "sans-serif", 18, QFont::Bold   );
+QFont large( "sans-serif", 24, QFont::Bold   );
 
 
 Canvas::Units g_eUnitsAirspeed = Canvas::Knots;
@@ -56,7 +56,11 @@ Canvas::Units g_eUnitsAirspeed = Canvas::Knots;
 
 // Setup minimal UI elements and make the connections
 AHRSMainWin::AHRSMainWin( const QString &qsIP, bool bPortrait, StreamReader *pStream )
+#if defined(Q_OS_ANDROID)
+    : QMainWindow( Q_NULLPTR ),
+#else
     : QMainWindow( Q_NULLPTR, Qt::Window | (qApp->arguments().contains( "window" ) ? Qt::Widget : Qt::FramelessWindowHint) ),
+#endif
       m_pStratuxStream( pStream ),
       m_bStartup( true ),
       m_pMenuDialog( nullptr ),
@@ -94,7 +98,8 @@ AHRSMainWin::AHRSMainWin( const QString &qsIP, bool bPortrait, StreamReader *pSt
 
     QScreen *pScreen = QGuiApplication::primaryScreen();
     // setOrientationUpdateMask eliminado en Qt 6
-    connect( pScreen, SIGNAL( orientationChanged( Qt::ScreenOrientation ) ), this, SLOT( orient( Qt::ScreenOrientation ) ) );
+    if( pScreen )
+        connect( pScreen, SIGNAL( orientationChanged( Qt::ScreenOrientation ) ), this, SLOT( orient( Qt::ScreenOrientation ) ) );
 
     m_iReconnectTimer = startTimer( 5000 ); // Forever timer to periodically check if we need to reconnect
 
@@ -216,8 +221,8 @@ void AHRSMainWin::upgradeStratofier()
 {
     delete m_pMenuDialog;
     m_pMenuDialog = nullptr;
-    if( QMessageBox::question( this, "UPGRADE", "Upgrading Stratofier requires an active internet connection.\n\n"
-                                                "Select 'Yes' to download and install the latest Stratofier version.",
+    if( QMessageBox::question( this, "ACTUALIZAR", "Actualizar Stratofier requiere una conexión a Internet activa.\n\n"
+                                                "Seleccione 'Sí' para descargar e instalar la última versión de Stratofier.",
                                QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
     {
 #ifdef Q_OS_LINUX
@@ -283,7 +288,7 @@ void AHRSMainWin::timerEvent( QTimerEvent *pEvent )
 
 void AHRSMainWin::changeTimer()
 {
-    Keypad keypad( this, "TIMER", true );
+    Keypad keypad( this, "TEMPORIZADOR", true );
 
     m_pAHRSDisp->canvas()->setKeypadGeometry( &keypad );
 
@@ -368,7 +373,7 @@ void AHRSMainWin::unitsAirspeed()
         if( g_eUnitsAirspeed == Canvas::MPH )
             pDlg->m_pUnitsAirspeedButton->setText( "MPH" );
         else if( g_eUnitsAirspeed == Canvas::Knots )
-            pDlg->m_pUnitsAirspeedButton->setText( "KNOTS" );
+            pDlg->m_pUnitsAirspeedButton->setText( "NUDOS" );
         else
             pDlg->m_pUnitsAirspeedButton->setText( "KPH" );
     }
