@@ -1,27 +1,28 @@
-#include <QAndroidJniObject>
+#include <QJniObject>
+#include <QCoreApplication>
+#include <QNativeInterface>
 #include <QtDebug>
-#include "jni.h"
 #include "ScreenLocker.h"
 
 ScreenLocker::ScreenLocker()
 {
-    QAndroidJniObject activity = QAndroidJniObject::callStaticObjectMethod(
-        "org/qtproject/qt5/android/QtNative",
-        "activity",
-        "()Landroid/app/Activity;");
+    // Qt 6: obtener el contexto de la Activity
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
 
     if (!activity.isValid()) {
-        qWarning() << "ScreenLocker: activity not valid";
+        qWarning() << "ScreenLocker: activity/context not valid";
         return;
     }
 
-    QAndroidJniObject serviceName = QAndroidJniObject::getStaticObjectField<jstring>(
-        "android/content/Context", "POWER_SERVICE");
+    QJniObject serviceName = QJniObject::getStaticObjectField(
+        "android/content/Context",
+        "POWER_SERVICE",
+        "Ljava/lang/String;");
 
     if (!serviceName.isValid())
         return;
 
-    QAndroidJniObject powerMgr = activity.callObjectMethod(
+    QJniObject powerMgr = activity.callObjectMethod(
         "getSystemService",
         "(Ljava/lang/String;)Ljava/lang/Object;",
         serviceName.object<jobject>());
@@ -29,10 +30,11 @@ ScreenLocker::ScreenLocker()
     if (!powerMgr.isValid())
         return;
 
-    jint levelAndFlags = QAndroidJniObject::getStaticField<jint>(
-        "android/os/PowerManager", "SCREEN_BRIGHT_WAKE_LOCK");
+    jint levelAndFlags = QJniObject::getStaticField<jint>(
+        "android/os/PowerManager",
+        "SCREEN_BRIGHT_WAKE_LOCK");
 
-    QAndroidJniObject tag = QAndroidJniObject::fromString("Stratofier");
+    QJniObject tag = QJniObject::fromString("Stratofier");
 
     m_screenLock = powerMgr.callObjectMethod(
         "newWakeLock",
