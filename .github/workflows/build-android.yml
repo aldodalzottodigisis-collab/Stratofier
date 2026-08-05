@@ -23,8 +23,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # androiddeployqt necesita las herramientas host (moc/uic/rcc) de la
-      # MISMA versión de Qt que el target de Android.
       - name: Install host (desktop) Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -72,6 +70,10 @@ jobs:
         run: |
           cd build-android
           make -j"$(nproc)"
+          # Instala el .so en el sitio que androiddeployqt espera
+          make INSTALL_ROOT=$PWD/android-build install || true
+          # Alternativa moderna de Qt:
+          make apk_install_target || true
 
       - name: Package APK with androiddeployqt
         run: |
@@ -80,7 +82,8 @@ jobs:
             --input android-Stratofier-deployment-settings.json \
             --output android-build \
             --android-platform "android-${ANDROID_API_LEVEL}" \
-            --gradle
+            --gradle \
+            --verbose
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
