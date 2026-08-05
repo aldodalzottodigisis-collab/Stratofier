@@ -1,7 +1,7 @@
 #ifndef __SCREENLOCKER_H__
 #define __SCREENLOCKER_H__
 
-#include <QAndroidJniObject>
+#include <QJniObject>
 
 class ScreenLocker
 {
@@ -10,7 +10,7 @@ public:
     virtual ~ScreenLocker();
 
 private:
-    QAndroidJniObject m_screenLock;
+    QJniObject m_screenLock;
 };
 
 #endif // __SCREENLOCKER_H__
