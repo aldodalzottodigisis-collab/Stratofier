@@ -2,7 +2,7 @@
 #
 # Stratofier
 # Copyright 2019 Sky Fun
-# Updated for modern Android (targetSdk 34)
+# Updated for Qt 6.10 + Android 16 (API 36)
 #
 #-------------------------------------------------
 
@@ -14,16 +14,12 @@ VPATH += ./include \
          ../Stratofier/include
 
 android {
-    QT += androidextras
-    CONFIG += mobility
+    # En Qt 6 ya NO existe androidextras
     VPATH += $$PWD/android
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
-    # Cambia según el NDK que tengas instalado (android-29, 30, 31 o 34)
-    ANDROID_NDK_PLATFORM = android-29
-
-    # ABIs modernas (arm64 es la importante hoy)
-    ANDROID_ABIS = arm64-v8a armeabi-v7a
+    ANDROID_NDK_PLATFORM = android-36
+    ANDROID_ABIS = arm64-v8a
 
     DISTFILES += \
         android/AndroidManifest.xml \
