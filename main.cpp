@@ -13,9 +13,9 @@ Stratofier Stratux AHRS Display
 
 #include "AHRSMainWin.h"
 #include "Keyboard.h"
-#if defined( Q_OS_ANDROID )
-#include "ScreenLocker.h"
-#endif
+// #if defined( Q_OS_ANDROID )
+// #include "ScreenLocker.h"
+// #endif
 #include "StreamReader.h"
 
 
@@ -30,25 +30,27 @@ StreamReader *g_pStratuxStream = nullptr;
 int main( int argc, char *argv[] )
 {
 #if defined( Q_OS_ANDROID )
-    QGuiApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+    // En Qt 6 ya no hace falta AA_EnableHighDpiScaling (está deprecado)
+    // QGuiApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 #endif
 
     QApplication guiApp( argc, argv );
-	QStringList  qslArgs = guiApp.arguments();
+    QStringList  qslArgs = guiApp.arguments();
     QString      qsArg;
     QString      qsToken, qsVal;
-	bool         bMax = true;
+    bool         bMax = true;
     QString      qsIP;
     bool         bPortrait = true;
     AHRSMainWin *pMainWin = 0;
-    QString      qsCurrWorkPath( "/home/pi/Stratofier" );  // If you put Stratofier anywhere else, specify home=<whatever> as an argument when running
+    QString      qsCurrWorkPath( "/home/pi/Stratofier" );
     bool         bWindowed = false;
 
 #if defined( Q_OS_ANDROID )
-    ScreenLocker locker;    // Keeps screen on until app exit where it's destroyed.
+    // ScreenLocker desactivado temporalmente para diagnosticar el crash
+    // ScreenLocker locker;
 #endif
 
-	foreach( qsArg, qslArgs )
+    foreach( qsArg, qslArgs )
     {
         QStringList qsl = qsArg.split( '=' );
 
@@ -70,12 +72,11 @@ int main( int argc, char *argv[] )
         }
     }
 
-// For Android, override any command line setting for portrait/landscape
 #if defined( Q_OS_ANDROID )
     QScreen *pScreen = QGuiApplication::primaryScreen();
-
-    bPortrait = ((pScreen->orientation() == Qt::PortraitOrientation) || (pScreen->orientation() == Qt::InvertedPortraitOrientation));
-// For running locally we need to set the correct working path so relative references work both locally and on the Pi
+    if( pScreen )
+        bPortrait = ((pScreen->orientation() == Qt::PortraitOrientation) ||
+                     (pScreen->orientation() == Qt::InvertedPortraitOrientation));
 #else
     QDir::setCurrent( qsCurrWorkPath );
 #endif
@@ -93,21 +94,20 @@ int main( int argc, char *argv[] )
 
     qsIP = g_pSet->value( "StratuxIP", "192.168.10.1" ).toString();
 
-    qInfo() << "Starting Stratofier";
+    qInfo() << "Iniciando Stratofier";
     g_pStratuxStream = new StreamReader( qsIP );
     pMainWin = new AHRSMainWin( qsIP, bPortrait, g_pStratuxStream );
-    // This is the normal mode for a dedicated Raspberry Pi touchscreen or on Android
+
     if( bMax )
         pMainWin->showMaximized();
-    // This is only intended for running directly on the host PC without an emulator
-	else
-	{
+    else
+    {
         pMainWin->show();
         if( bPortrait )
             pMainWin->setGeometry( bWindowed ? 50 : 0, bWindowed ? 50 : 0, 562, 1000 );
         else
             pMainWin->setGeometry( bWindowed ? 50 : 0, bWindowed ? 50 : 0, 1000, 562 );
-	}
+    }
 
     guiApp.exec();
 
