@@ -93,7 +93,7 @@ AHRSMainWin::AHRSMainWin( const QString &qsIP, bool bPortrait, StreamReader *pSt
     QTimer::singleShot( 500, this, SLOT( init() ) );
 
     QScreen *pScreen = QGuiApplication::primaryScreen();
-    pScreen->setOrientationUpdateMask( Qt::PortraitOrientation | Qt::InvertedPortraitOrientation | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation );
+    // setOrientationUpdateMask eliminado en Qt 6
     connect( pScreen, SIGNAL( orientationChanged( Qt::ScreenOrientation ) ), this, SLOT( orient( Qt::ScreenOrientation ) ) );
 
     m_iReconnectTimer = startTimer( 5000 ); // Forever timer to periodically check if we need to reconnect
