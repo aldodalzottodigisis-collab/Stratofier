@@ -1,16 +1,17 @@
 #include <QJniObject>
-#include <QCoreApplication>
-#include <QNativeInterface>
 #include <QtDebug>
 #include "ScreenLocker.h"
 
 ScreenLocker::ScreenLocker()
 {
-    // Qt 6: obtener el contexto de la Activity
-    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    // Qt 6: clase actualizada (sin el "5")
+    QJniObject activity = QJniObject::callStaticObjectMethod(
+        "org/qtproject/qt/android/QtNative",
+        "activity",
+        "()Landroid/app/Activity;");
 
     if (!activity.isValid()) {
-        qWarning() << "ScreenLocker: activity/context not valid";
+        qWarning() << "ScreenLocker: activity not valid";
         return;
     }
 
