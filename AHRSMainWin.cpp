@@ -9,7 +9,6 @@ Stratofier Stratux AHRS Display
 #include <QPushButton>
 #include <QMessageBox>
 #include <QFont>
-#include <QDesktopWidget>
 #include <QScreen>
 #include <QGuiApplication>
 #include <QSettings>
@@ -396,4 +395,3 @@ void AHRSMainWin::settingsClosed()
 {
     QTimer::singleShot( 100, this, SLOT( menu() ) );
 }
-
