@@ -16,11 +16,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
-
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="true"
@@ -33,7 +28,8 @@
         android:name="org.qtproject.qt.android.bindings.QtApplication"
         android:label="Stratofier"
         android:icon="@drawable/icon"
-        android:extractNativeLibs="true">
+        android:extractNativeLibs="true"
+        android:requestLegacyExternalStorage="true">
 
         <activity
             android:name="org.qtproject.qt.android.bindings.QtActivity"
@@ -48,13 +44,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Datos que androiddeployqt necesita -->
             <meta-data android:name="android.app.lib_name" android:value="Stratofier" />
             <meta-data android:name="android.app.arguments" android:value="" />
-            <meta-data android:name="android.app.extract_android_style" android:value="full" />
+            <!-- "full" rompe en Android 9+ ; usar minimal o none -->
+            <meta-data android:name="android.app.extract_android_style" android:value="none" />
             <meta-data android:name="android.app.background_running" android:value="false" />
             <meta-data android:name="android.app.auto_screen_scale_factor" android:value="false" />
-
         </activity>
     </application>
 </manifest>
